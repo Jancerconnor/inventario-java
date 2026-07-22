@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario — Login</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #0891b2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-wrapper { width: 100%; max-width: 400px; }
+        .login-brand { text-align: center; margin-bottom: 28px; }
+        .login-icon {
+            width: 64px; height: 64px;
+            background: white; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; margin: 0 auto 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .login-brand h1 { font-size: 26px; font-weight: 800; color: white; }
+        .login-brand p { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 6px; }
+        .login-card {
+            background: white; border-radius: 18px;
+            padding: 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        .login-card h2 { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .login-card > p { color: #64748b; font-size: 13px; margin-bottom: 24px; }
+        label { display:block; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+        input {
+            width: 100%; padding: 11px 14px;
+            border: 1.5px solid #e2e8f0; border-radius: 10px;
+            background: #f8faff; color: #0f172a;
+            font-size: 14px; font-family: 'Segoe UI', sans-serif;
+            margin-bottom: 16px; transition: 0.2s;
+        }
+        input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.12); }
+        .btn-login {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, #1e40af, #2563eb);
+            color: white; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700;
+            font-family: 'Segoe UI', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+        }
+        .btn-login:hover { transform: translateY(-1px); }
+        .error-box {
+            background: #fee2e2; border: 1px solid #fecaca;
+            color: #991b1b; padding: 11px 14px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; margin-bottom: 18px;
+            display: none;
+        }
+        .login-footer { text-align:center; margin-top:22px; color:rgba(255,255,255,0.35); font-size:12px; }
+    </style>
+</head>
+<body>
+<div class="login-wrapper">
+    <div class="login-brand">
+        <div class="login-icon">📦</div>
+        <h1>Sistema de Inventario</h1>
+        <p>Ingresa tus credenciales para continuar</p>
+    </div>
+    <div class="login-card">
+        <h2>Bienvenido 👋</h2>
+        <p>Accede a tu cuenta para gestionar el inventario</p>
+        <div class="error-box" id="errorBox">⚠ Usuario o contraseña incorrectos</div>
+        <div>
+            <label>Usuario</label>
+            <input type="text" id="usuario" placeholder="Tu usuario" autofocus>
+        </div>
+        <div>
+            <label>Contraseña</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+        <button class="btn-login" onclick="login()">Ingresar al sistema →</button>
+    </div>
+    <div class="login-footer">© 2026 Sistema de Inventario</div>
+</div>
+
+<script>
+    document.getElementById("password").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") login();
+    });
+
+    function login() {
+        const usuario  = document.getElementById("usuario").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!usuario || !password) {
+            document.getElementById("errorBox").style.display = "block";
+            document.getElementById("errorBox").innerText = "⚠ Completa todos los campos";
+            return;
+        }
+
+        fetch("http://localhost:8080/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ usuario, password })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    sessionStorage.setItem("usuario", data.usuario);
+                    window.location.href = "/index.html";
+                } else {
+                    document.getElementById("errorBox").style.display = "block";
+                    document.getElementById("errorBox").innerText = "⚠ Usuario o contraseña incorrectos";
+                }
+            })
+            .catch(() => {
+                document.getElementById("errorBox").style.display = "block";
+                document.getElementById("errorBox").innerText = "⚠ Error de conexión";
+            });
+    }
+</script>
+</body>
+</html>

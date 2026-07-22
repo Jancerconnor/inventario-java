@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Inventario</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4ff;
+            color: #1e293b;
+        }
+
+        header {
+            background: #1e3a8a;
+            color: white;
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+
+        header h1 { font-size: 20px; font-weight: 800; }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 16px rgba(30,64,175,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #1e3a8a;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+        label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            padding: 9px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Segoe UI', sans-serif;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        }
+
+        button {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Segoe UI', sans-serif;
+            transition: 0.18s;
+        }
+
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-green { background: #16a34a; color: white; }
+        .btn-green:hover { background: #15803d; }
+        .btn-red { background: #dc2626; color: white; }
+        .btn-red:hover { background: #b91c1c; }
+        .btn-gray { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;<!
+            font-size: 14px;
+        }
+
+        thead { background: #1e3a8a; }
+
+        th {
+            padding: 12px 14px;
+            color: #93c5fd;
+            font-size: 11px;
+            font-wscrieight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+        }
+
+        tbody tr:hover { background: #eff6ff; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-green { background: #dcfce7; color: #16a34a; }
+        .badge-yellow { background: #fef3c7; color: #d97706; }
+        .badge-red { background: #fee2e2; color: #dc2626; }
+
+        .acciones { display: flex; gap: 6px; }
+
+        .sin-datos {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+<<header>
+    <h1>📦 Sistema de Inventario</h1>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <span id="usuarioLogueado" style="color:rgba(255,255,255,0.7); font-size:13px; font-weight:600;"></span>
+        <button onclick="toggleMovimientos()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">
+            📋 Movimientos
+        </button>
+        <button onclick="cerrarSesion()" style="background:rgba(220,38,38,0.2); color:#fca5a5; border:1px solid rgba(220,38,38,0.3); padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">
+            🔒 Salir
+        </button>
+    </div>
+</header>
+<main>
+    <!-- FORMULARIO -->
+    <div class="card">
+        <h2>➕ Agregar Producto</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="nombre" placeholder="Ej: iPhone 15">
+            </div>
+            <div class="form-group">
+                <label>Cantidad</label>
+                <input type="number" id="cantidad" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Stock Mínimo</label>
+                <input type="number" id="minimo" placeholder="5" min="0">
+            </div>
+        </div>
+        <button class="btn-primary" onclick="agregarProducto()">💾 Agregar Producto</button>
+    </div>
+
+
+    <!-- STATS -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:16px; margin-bottom:24px;">
+        <div class="card" style="display:flex; align-items:center; gap:16px; padding:20px; margin-bottom:0;">
+            <div style="font-size:30px;">📦</div>
+            <div>
+                <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Total Productos</div>
+                <div style="font-size:28px; font-weight:800; color:#1e3a8a;" id="statTotal">0</div>
+            </div>
+        </div>
+        <div class="card" style="display:flex; align-items:center; gap:16px; padding:20px; margin-bottom:0;">
+            <div style="font-size:30px;">✅</div>
+            <div>
+                <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Disponibles</div>
+                <div style="font-size:28px; font-weight:800; color:#16a34a;" id="statDisponibles">0</div>
+            </div>
+        </div>
+        <div class="card" style="display:flex; align-items:center; gap:16px; padding:20px; margin-bottom:0;">
+            <div style="font-size:30px;">⚠️</div>
+            <div>
+                <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Bajo Stock</div>
+                <div style="font-size:28px; font-weight:800; color:#d97706;" id="statBajoStock">0</div>
+            </div>
+        </div>
+        <div class="card" style="display:flex; align-items:center; gap:16px; padding:20px; margin-bottom:0;">
+            <div style="font-size:30px;">🔴</div>
+            <div>
+                <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Críticos</div>
+                <div style="font-size:28px; font-weight:800; color:#dc2626;" id="statCriticos">0</div>
+            </div>
+        </div>
+    </div>
+    <!-- TABLA -->
+    <!-- BUSCADOR -->
+    <div style="margin-bottom:16px; display:flex; gap:10px;">
+        <input type="text" id="buscarProducto" placeholder="🔍 Buscar producto por nombre..."
+               style="flex:1; padding:10px 14px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;">
+    </div>
+    <div class="card">
+        <h2>📋 Lista de Productos</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Mínimo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tablaProductos">
+            <tr><td colspan="5" class="sin-datos">Cargando...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- MOVIMIENTOS -->
+    <div class="card" id="seccionMovimientos" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h2 style="margin-bottom:0;">📋 Historial de Movimientos</h2>
+            <button onclick="eliminarMovimientos()" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">
+                🗑 Eliminar Historial
+            </button>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Tipo</th>
+                <th>Cantidad</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+            </tr>
+            </thead>
+            <tbody id="tablaMovimientos">
+            <tr><td colspan="4" class="sin-datos">Cargando...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+
+    // Mostrar usuario
+    const userEl = document.getElementById("usuarioLogueado");
+    if (userEl) userEl.innerText = "👤 " + (sessionStorage.getItem("usuario") || "");
+
+    function cerrarSesion() {
+        sessionStorage.removeItem("usuario");
+        window.location.href = "/login.html";
+    }
+    const API = "http://localhost:8080/api/productos";
+
+    // Cargar productos al iniciar
+    document.addEventListener("DOMContentLoaded", cargarProductos);
+
+    function cargarProductos() {
+        fetch(API)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById("tablaProductos");
+                tbody.innerHTML = "";
+
+
+                // Actualizar stats
+                document.getElementById("statTotal").innerText = data.length;
+                document.getElementById("statDisponibles").innerText = data.filter(p => p.estado === "Disponible").length;
+                document.getElementById("statBajoStock").innerText = data.filter(p => p.estado === "Bajo Stock").length;
+                document.getElementById("statCriticos").innerText = data.filter(p => p.estado === "Agotado").length;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="sin-datos">No hay productos registrados</td></tr>`;
+                    return;
+                }
+
+                data.forEach(p => {
+                    let badgeClass = "badge-green";
+                    if (p.estado === "Bajo Stock") badgeClass = "badge-yellow";
+                    if (p.estado === "Agotado") badgeClass = "badge-red";
+
+                    tbody.innerHTML += `
+                <tr>
+                    <td><strong>${p.nombre}</strong></td>
+                    <td>${p.cantidad}</td>
+                    <td>${p.minimo}</td>
+                    <td><span class="badge ${badgeClass}">${p.estado}</span></td>
+                    <td>
+                        <div class="acciones">
+                            <button class="btn-green" onclick="sumar(${p.id})">+ Sumar</button>
+                            <button class="btn-red" onclick="retirar(${p.id})">- Retirar</button>
+                            <button class="btn-gray" onclick="eliminar(${p.id})">🗑</button>
+                        </div>
+                    </td>
+                </tr>`;
+                });
+            })
+            .catch(err => console.error("Error:", err));
+    }
+
+    function agregarProducto() {
+        const nombre   = document.getElementById("nombre").value.trim();
+        const cantidad = parseInt(document.getElementById("cantidad").value);
+        const minimo   = parseInt(document.getElementById("minimo").value);
+
+        if (!nombre || isNaN(cantidad) || isNaN(minimo)) {
+            alert("Completa todos los campos");
+            return;
+        }
+
+        fetch(API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombre, cantidad, minimo, estado: "Disponible" })
+        })
+            .then(res => res.json())
+            .then(() => {
+                document.getElementById("nombre").value   = "";
+                document.getElementById("cantidad").value = "";
+                document.getElementById("minimo").value   = "";
+                cargarProductos();
+            });
+    }
+
+    function sumar(id) {
+        const cantidad = prompt("¿Cuántas unidades deseas sumar?");
+        if (!cantidad) return;
+        const usuario = prompt("¿Nombre de quien realiza la suma?");
+        if (!usuario) return;
+        fetch(`${API}/${id}/sumar?cantidad=${cantidad}&usuario=${encodeURIComponent(usuario)}`, { method: "PUT" })
+            .then(() => cargarProductos());
+    }
+
+    function retirar(id) {
+        const cantidad = prompt("¿Cuántas unidades deseas retirar?");
+        if (!cantidad) return;
+        const usuario = prompt("¿Nombre de quien realiza el retiro?");
+        if (!usuario) return;
+        fetch(`${API}/${id}/retirar?cantidad=${cantidad}&usuario=${encodeURIComponent(usuario)}`, { method: "PUT" })
+            .then(res => {
+                if (!res.ok) { alert("No hay suficiente stock"); return; }
+                cargarProductos();
+            });
+    }
+
+    function eliminar(id) {
+        if (!confirm("¿Eliminar este producto?")) return;
+        fetch(`${API}/${id}`, { method: "DELETE" })
+            .then(() => cargarProductos());
+    }
+    // Buscador
+    document.getElementById("buscarProducto").addEventListener("keyup", function() {
+        let filtro = this.value.toLowerCase();
+        document.querySelectorAll("#tablaProductos tr").forEach(fila => {
+            fila.style.display = fila.innerText.toLowerCase().includes(filtro) ? "" : "none";
+        });
+    });
+
+    // Cargar movimientos
+    function cargarMovimientos() {
+        fetch("http://localhost:8080/api/movimientos")
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById("tablaMovimientos");
+                tbody.innerHTML = "";
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="sin-datos">No hay movimientos registrados</td></tr>`;
+                    return;
+                }
+
+                data.forEach(m => {
+                    const esSuma = m.tipo === "SUMA";
+                    tbody.innerHTML += `
+<tr>
+    <td><strong>${m.productoNombre}</strong></td>
+    <td>
+        <span class="badge ${esSuma ? 'badge-green' : 'badge-red'}">
+            ${esSuma ? '+ SUMA' : '- RETIRO'}
+        </span>
+    </td>
+    <td>${m.cantidad}</td>
+    <td>${m.usuario || 'Sistema'}</td>
+    <td>${new Date(m.fecha).toLocaleString('es-DO')}</td>
+</tr>`;
+
+                });
+            });
+    }
+
+    function toggleMovimientos() {
+        const seccion = document.getElementById("seccionMovimientos");
+        if (seccion.style.display === "none") {
+            seccion.style.display = "block";
+            cargarMovimientos();
+        } else {
+            seccion.style.display = "none";
+        }
+    }
+
+    // Llamar movimientos al cargar
+    document.addEventListener("DOMContentLoaded", () => {
+        cargarProductos();
+        cargarMovimientos();
+    });
+
+    function eliminarMovimientos() {
+        if (!confirm("¿Seguro que deseas eliminar todo el historial de movimientos?")) return;
+        fetch("http://localhost:8080/api/movimientos", { method: "DELETE" })
+            .then(() => {
+                cargarMovimientos();
+            });
+    }
+</script>
+
+</body>
+</html>
